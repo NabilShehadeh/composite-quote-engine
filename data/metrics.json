@@ -1,0 +1,93 @@
+{
+ "jobs": 8000,
+ "train": 4800,
+ "calibration": 1600,
+ "test": 1600,
+ "formula_mape": 12.2,
+ "model_mape": 6.7,
+ "formula_within10": 63.6,
+ "model_within10": 80.1,
+ "complex_formula_mape": 25.8,
+ "complex_model_mape": 11.6,
+ "coverage": 88.8,
+ "target_coverage": 90,
+ "median_band_pct": 19.7,
+ "q_hat": 0.01386,
+ "trees": {
+  "lo": 175,
+  "mid": 107,
+  "hi": 144
+ },
+ "importance": [
+  {
+   "feature": "zero_draft_frac",
+   "label": "Missing draft",
+   "share": 0.6885
+  },
+  {
+   "feature": "sharp_edge_m",
+   "label": "Sharp corners",
+   "share": 0.0631
+  },
+  {
+   "feature": "depth_ratio",
+   "label": "Draw depth",
+   "share": 0.0576
+  },
+  {
+   "feature": "layup_area_m2",
+   "label": "Layup area",
+   "share": 0.057
+  },
+  {
+   "feature": "log_qty",
+   "label": "Order quantity",
+   "share": 0.0482
+  },
+  {
+   "feature": "depth_mm",
+   "label": "Depth",
+   "share": 0.0184
+  },
+  {
+   "feature": "min_draft_deg",
+   "label": "Minimum draft",
+   "share": 0.0161
+  },
+  {
+   "feature": "curvature",
+   "label": "Curvature",
+   "share": 0.0136
+  },
+  {
+   "feature": "footprint_m2",
+   "label": "Mold footprint",
+   "share": 0.0104
+  },
+  {
+   "feature": "mold_len_mm",
+   "label": "Mold length",
+   "share": 0.0102
+  },
+  {
+   "feature": "thickness_mm",
+   "label": "Thickness",
+   "share": 0.0063
+  },
+  {
+   "feature": "mold_wid_mm",
+   "label": "Mold width",
+   "share": 0.0052
+  },
+  {
+   "feature": "max_dim_mm",
+   "label": "Largest dimension",
+   "share": 0.0051
+  },
+  {
+   "feature": "plies",
+   "label": "Ply count",
+   "share": 0.0002
+  }
+ ]
+}

@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Composite Quote Engine</title>
+  <meta name="description" content="Drop in a carbon-fibre part to get a price range, lead time and the design changes that would cut its cost. A prototype by Nabil Shehadeh.">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#0e0e0e">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='10' fill='%231F5FBF'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://unpkg.com/@phosphor-icons/web@2.1.1" defer></script>
+  <script type="importmap">
+    { "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    } }
+  </script>
+</head>
+<body>
+  <header class="top wrap">
+    <a class="back" href="/"><i class="ph ph-arrow-left" aria-hidden="true"></i> Nabil Shehadeh</a>
+    <a class="top-link" href="#how">How it works</a>
+  </header>
+
+  <main class="wrap">
+    <section class="intro">
+      <h1>Instant quotes for carbon-fibre parts.</h1>
+      <p>Drop in a part to get a price range, lead time and the design changes that would cut its cost.</p>
+    </section>
+
+    <section class="studio" aria-label="Quote">
+      <div class="stage">
+        <div class="viewer" id="viewer">
+          <canvas id="canvas" aria-label="3D view of the part. Drag to rotate, scroll to zoom."></canvas>
+          <div class="view-modes" role="radiogroup" aria-label="View">
+            <button type="button" role="radio" aria-checked="true" data-mode="shaded">Shaded</button>
+            <button type="button" role="radio" aria-checked="false" data-mode="draft">Draft map</button>
+          </div>
+          <div class="legend" id="legend" aria-hidden="true">
+            <span><i style="--c:var(--warn)"></i>Under 1° or undercut</span>
+            <span><i style="--c:#8fa7c9"></i>1° to 3°</span>
+            <span><i style="--c:var(--accent-hi)"></i>Over 3°</span>
+            <span><i style="--c:#3a3d42"></i>Cut edge</span>
+          </div>
+          <div class="drop" id="drop" aria-hidden="true"><i class="ph ph-upload-simple"></i>Drop an STL to quote it</div>
+          <p class="hint" id="hint">Drag to rotate</p>
+        </div>
+
+        <div class="parts" role="group" aria-label="Parts">
+          <div class="samples" id="samples"></div>
+          <div class="part-actions">
+            <button type="button" class="chip" id="shuffle" data-tip="A new random part"><i class="ph ph-shuffle" aria-hidden="true"></i> Random</button>
+            <label class="chip upload" for="file"><i class="ph ph-upload-simple" aria-hidden="true"></i> Upload STL</label>
+            <input type="file" id="file" accept=".stl,model/stl,application/sla" hidden>
+            <select id="units" class="units" aria-label="Units of the uploaded file">
+              <option value="1">mm</option>
+              <option value="25.4">inches</option>
+              <option value="1000">metres</option>
+            </select>
+          </div>
+          <p class="file-msg" id="file-msg" role="status" aria-live="polite"></p>
+        </div>
+      </div>
+
+      <aside class="panel" id="panel" aria-live="polite">
+        <div class="part-head">
+          <p class="part-name" id="part-name">Loading</p>
+          <p class="part-meta" id="part-meta">&nbsp;</p>
+        </div>
+
+        <div class="qty" role="radiogroup" aria-label="Order quantity" id="qty">
+          <span class="qty-thumb" id="qty-thumb" aria-hidden="true"></span>
+        </div>
+
+        <div class="price-block">
+          <p class="price"><span id="price">&nbsp;</span> <span class="per">per part</span></p>
+          <div class="range" aria-hidden="true">
+            <span class="range-band" id="range-band"></span>
+            <span class="range-dot" id="range-dot"></span>
+          </div>
+          <p class="range-label" id="range-label">&nbsp;</p>
+          <p class="why" id="why">&nbsp;</p>
+        </div>
+
+        <dl class="facts">
+          <div><dt>Order total</dt><dd id="total">&nbsp;</dd></div>
+          <div><dt>Lead time</dt><dd id="lead">&nbsp;</dd></div>
+          <div><dt>Layup cycle</dt><dd id="cycle">&nbsp;</dd></div>
+        </dl>
+
+        <div class="checks">
+          <p class="sub">Design checks</p>
+          <ul id="flags"></ul>
+        </div>
+
+        <details class="breakdown">
+          <summary>Price breakdown <i class="ph ph-caret-down" aria-hidden="true"></i></summary>
+          <dl id="breakdown"></dl>
+        </details>
+      </aside>
+    </section>
+
+    <section class="how" id="how">
+      <h2>How it works</h2>
+      <div class="how-grid">
+        <div class="how-copy">
+          <p>The geometry is read in your browser: laminate area and thickness, ply count, the best pull direction out of the mold, draft on every face, sharp corners and draw depth. Nothing is uploaded.</p>
+          <p>A rule-of-thumb formula prices material, layup, cure, trimming, inspection and tooling. Then a gradient-boosted model, trained on <span id="m-jobs">8,000</span> simulated past jobs, predicts how far the real job lands from that formula and why. Conformal calibration turns three quantile models into a price range that should hold 90% of the time.</p>
+          <p class="honest">The jobs, rates and prices are simulated for this demo. They are not any supplier's real data. Change the rates below and every quote updates.</p>
+        </div>
+
+        <div class="card-metrics">
+          <p class="sub">On <span id="m-test">1,600</span> held-out jobs</p>
+          <dl class="metrics" id="metrics"></dl>
+          <p class="sub imp-title">What moves the price most</p>
+          <ol class="imp" id="importance"></ol>
+        </div>
+      </div>
+
+      <div class="rates">
+        <p class="sub">Rates <button type="button" class="reset" id="reset">Reset</button></p>
+        <div class="rate-grid" id="rates"></div>
+      </div>
+    </section>
+
+    <footer class="foot">A prototype by <a href="/">Nabil Shehadeh</a>. Built with three.js and LightGBM.</footer>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
